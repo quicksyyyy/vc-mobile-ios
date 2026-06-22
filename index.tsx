@@ -1,21 +1,21 @@
-import { definePlugin, OptionType } from "@utils/types";
-import { Webpack } from "@webpack";
+import definePlugin, { OptionType } from "@utils/types";
+import { findByProps } from "@webpack";
 import { Forms } from "@webpack/common";
 
-const PlatformModule = Webpack.findByProps("getPlatform", "PlatformInfo");
+// Correctly resolving the platform identification module via direct extraction
+const PlatformModule = findByProps("getPlatform", "PlatformInfo");
 
 export default definePlugin({
     name: "MobilePlatformSpoof",
     description: "Spoof your platform string. Open settings to select between iOS and Android.",
     authors: [{ name: "Community Peer", id: 1234567890n }],
 
-    // 1. Define the configurable settings panel schema
     options: {
         useiOS: {
             type: OptionType.BOOLEAN,
             description: "Toggle on for iOS, toggle off for Android status",
             default: true,
-            restartNeeded: true // Requires a client reload to send the updated handshake packet
+            restartNeeded: true 
         }
     },
 
@@ -23,7 +23,7 @@ export default definePlugin({
         if (PlatformModule?.PlatformInfo) {
             this.originalPlatform = PlatformModule.PlatformInfo.os;
 
-            // 2. Read user choice from the options store dynamically
+            // Dynamically assign client identity properties based on user options configuration
             const targetOS = pluginOptions.useiOS.get() ? "Discord iOS" : "Discord Android";
             PlatformModule.PlatformInfo.os = targetOS; 
         }
@@ -35,7 +35,6 @@ export default definePlugin({
         }
     },
 
-    // 3. Render the UI elements within Vencord's core configuration system
     settingsPanel: ({ settings }) => (
         <>
             <Forms.FormSwitch
